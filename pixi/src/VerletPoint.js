@@ -32,7 +32,7 @@ export default class VerletPoint extends PIXI.Point{
         }
     }
 
-    updatePhysics(t, log) {
+    updatePhysics(t, log = false) {
         if(this.pinned){
             // console.error('nope');
             return;

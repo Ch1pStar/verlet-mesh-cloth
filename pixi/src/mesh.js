@@ -1,15 +1,12 @@
-import {renderer, stage} from './misc.js';
+import {renderer, stage, addControls, dist, getTxt} from './misc.js';
 import Stick from './stick.js';
 import VerletPoint from './VerletPoint.js';
+import {pointsWidth, pointsHeight, NUM_STEPS} from './config.js';
 
 let points = [];
 let sticks = [];
 let plane;
 let txt;
-
-
-const pointsWidth = 5;
-const pointsHeight = 5;
 
 const uploadVerts = () => {
   const len = plane.vertices.length;
@@ -47,7 +44,7 @@ const createSticks = () => {
         const p0 = points[invert*pointsWidth+x];
         const p1 = points[(invert+1)*pointsWidth+x];
 
-        sticks[q] = new Stick({p0:p0, p1: p1, l:d(p0, p1)});
+        sticks[q] = new Stick({p0:p0, p1: p1, l:dist(p0, p1)});
         q++;
       }
 
@@ -56,38 +53,14 @@ const createSticks = () => {
         const p0 = points[invert*pointsWidth+x];
         const p1 = points[invert*pointsWidth+x-1];
 
-        sticks[q] = new Stick({p0:p0, p1: p1, l:d(p0, p1)});;
+        sticks[q] = new Stick({p0:p0, p1: p1, l:dist(p0, p1)});;
         q++;
       }
     }
   }
-
 }
 
-const update = (t) => {
-  requestAnimationFrame(update);
-
-  updatePoints(t);
-
-  updateSticks(t);
-
-  uploadVerts();
-}
-
-const init = async () => {
-
-  // initRender();
-
-  // txt = PIXI.Texture.fromImage('snek.png');
-  txt = PIXI.Texture.fromImage('rtg-logo.svg');
-
-  await new Promise((res) => txt.baseTexture.once('loaded', res)); 
-
-  plane = new PIXI.mesh.Plane(txt, pointsWidth, pointsHeight);
-  // plane.x = width/2 - plane.width/2;
-  // plane.drawMode = renderer.gl.TRIANGLES;
-
-
+const createPoints = () => {
   const verts = plane.vertices;
   const len = verts.length;
 
@@ -100,24 +73,28 @@ const init = async () => {
 
     points[i/2] = p;
   }
+};
+
+const update = (t) => {
+  requestAnimationFrame(update);
+
+  updatePoints(t);
+
+  updateSticks(t);
+
+  uploadVerts();
+}
+
+const init = async () => {
+  // mesh requires loaded textures, so await
+  plane = new PIXI.mesh.Plane(await getTxt('rtg-logo.svg'), pointsWidth, pointsHeight);
+  // plane.drawMode = renderer.gl.TRIANGLES;
+
+  createPoints();
 
   createSticks();
 
-  document.addEventListener('mousemove', (e)=>{
-    const p = points[points.length - (pointsWidth/2)|0];
-
-    p.x = e.clientX;
-    p.y = e.clientY;
-  });
-
-  document.addEventListener('mouseup', (e)=>{
-    e.stopPropagation();
-    if(e.button !== 2) return;
-
-    for(let i=0,len=pointsWidth;i<len;i++){
-      points[i].pinned = false;
-    }
-  });
+  addControls(points);
 
   stage.addChild(plane);
 
@@ -126,19 +103,12 @@ const init = async () => {
 
 function updateSticks() {
   // console.time('sticks update');
-  // for(let k=0;k<4;k++){
+  for(let k=0;k<NUM_STEPS;k++){
     for(let i=0,len=sticks.length;i<len;i++){
         sticks[i].update();
     }
-  // }
+  }
   // console.timeEnd('sticks update');
-}
-
-function d(p0, p1){
-    const dx = p1.x - p0.x;
-    const dy = p1.y - p0.y;
-
-    return Math.sqrt(dx * dx + dy * dy);
 }
 
 document.addEventListener('DOMContentLoaded', init);
