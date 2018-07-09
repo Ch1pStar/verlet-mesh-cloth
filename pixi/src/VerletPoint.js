@@ -33,10 +33,7 @@ export default class VerletPoint extends PIXI.Point{
     }
 
     updatePhysics(t, log = false) {
-        if(this.pinned){
-            // console.error('nope');
-            return;
-        }
+        if(this.pinned) return;
         
         const vx = (this.x - this._prevX) * friction;
         const vy = (this.y - this._prevY) * friction;

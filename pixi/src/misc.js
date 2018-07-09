@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.r = renderer;
   window.v = view;
+  window.POINTS = pointsWidth * pointsHeight;
 
   requestAnimationFrame(draw);
 });
