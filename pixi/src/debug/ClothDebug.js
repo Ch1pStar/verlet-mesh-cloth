@@ -1,5 +1,6 @@
 import {stage, getTxt} from '../misc.js';
 import Cloth from '../Cloth.js';
+import { GUI } from '../../../node_modules/dat.gui/build/dat.gui.module.js';
 
 export default class ClothDebug {
 
@@ -8,6 +9,7 @@ export default class ClothDebug {
       const c = new Cloth(txt);
       const debug = new ClothDebug(c);
 
+      c.debug = this;
       this._enableControls = false;
 
       return debug;
@@ -16,11 +18,25 @@ export default class ClothDebug {
     constructor(cloth) {
         this.cloth = cloth;
 
-        this.addControls();
+        // this.addControls();
 
         PIXI.ticker.shared.add(cloth.update);
 
         stage.addChildAt(cloth, 0);
+
+        this.createDebugPanel();
+    }
+
+    createDebugPanel() {
+      const gui = new GUI();
+      const f = gui.addFolder('Cloth');
+
+      f.open();
+      f.add({frame: true}, 'frame').onChange((val) => this.cloth.pointsFrame.visible = val);
+      f.add({wind: true}, 'wind').onChange((val) => this.cloth.hasWind = val);
+      f.add({gravity: true}, 'gravity').onChange((val) => this.cloth.hasGravity = val);
+
+      document.body.appendChild(gui.domElement)
     }
 
     addControls() {

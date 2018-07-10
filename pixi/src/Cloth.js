@@ -1,7 +1,7 @@
 import {stage, dist, getTxt} from './misc.js';
 import Stick from './Stick.js';
 import VerletPoint from './VerletPoint.js';
-import {pointsWidth, pointsHeight, NUM_STEPS} from './config.js';
+import {pointsWidth, pointsHeight, NUM_STEPS, gravity} from './config.js';
 
 const Plane = PIXI.mesh.Plane;
 const Container = PIXI.particles.ParticleContainer;
@@ -19,6 +19,9 @@ export default class Cloth extends Plane{
     this.pointRows = pointRows;
     this._updateSteps = NUM_STEPS;
     this.update = this._update.bind(this);
+
+    this.hasWind = true;
+    this.hasGravity = true;
 
     this.createPoints();
 
@@ -44,13 +47,15 @@ export default class Cloth extends Plane{
   updatePoints(t) {
     const pts = this.points;
     const currentTime = performance.now();
-    const wind = Math.sin(currentTime*0.001)*0.1;
+    const wind = this.hasWind ? Math.sin(currentTime*0.001)*0.1 : 0;
+    const g = this.hasGravity ? gravity : 0;
 
     for(let i=0,len=pts.length;i<len;i++){
       const p = pts[i];
       const debug = p.debug;
 
       p.wind = wind;
+      p.gravity = g;
       p.updatePhysics(t);
 
       debug.x = p.x;
@@ -98,6 +103,7 @@ export default class Cloth extends Plane{
 
     const pointsDebug = new Container();
 
+    this.pointsFrame = pointsDebug;
     stage.addChild(pointsDebug);
 
     for(let i=0,len=verts.length;i<len;i+=2){
