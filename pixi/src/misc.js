@@ -33,7 +33,6 @@ export function addControls(points) {
   const p = points[points.length - (pointsWidth/2)|0];
 
   p.pinned = true;
-
   document.addEventListener('mousemove', (e) => {
     p.x = e.clientX;
     p.y = e.clientY;

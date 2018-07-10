@@ -1,9 +1,13 @@
+import { ELASTICITY } from './config.js';
+
 export default class Stick {
 
     constructor(data) {
         this.p0 = data.p0;
         this.p1 = data.p1;
         this.length = data.l;
+        // this._elasticityCoefficient = (ELASTICITY*Math.random())+1 | 0;
+        this._elasticityCoefficient = ELASTICITY || 1.5;
     }
 
     update() {
@@ -16,7 +20,7 @@ export default class Stick {
       let distance = Math.sqrt(dx * dx + dy * dy);
 
       let difference = this.length - distance;
-      let percent = difference / distance / 20;
+      let percent = difference / distance / this._elasticityCoefficient;
 
       let offsetX = dx * percent;
       let offsetY = dy * percent;
