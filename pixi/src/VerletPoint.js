@@ -1,4 +1,4 @@
-import {width, height, gravity, friction, bounce} from './config.js';
+import {width, height, gravity, wind, friction, bounce} from './config.js';
 
 export default class VerletPoint extends PIXI.Point{
 
@@ -7,6 +7,9 @@ export default class VerletPoint extends PIXI.Point{
 
         this._prevX = x;
         this._prevY = y;
+
+        this.gravity = gravity;
+        this.wind = wind;
 
         this.pinned = pinned;
 
@@ -44,8 +47,8 @@ export default class VerletPoint extends PIXI.Point{
         this._prevX = this.x;
         this._prevY = this.y;
 
-        this.x += vx;
-        this.y += vy + gravity;
+        this.x += vx + this.wind;
+        this.y += vy + this.gravity;
 
         this.constraint(vx, vy);
     }

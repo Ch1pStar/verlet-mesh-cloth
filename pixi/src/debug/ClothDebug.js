@@ -8,6 +8,8 @@ export default class ClothDebug {
       const c = new Cloth(txt);
       const debug = new ClothDebug(c);
 
+      this._enableControls = false;
+
       return debug;
     }
 
@@ -28,6 +30,8 @@ export default class ClothDebug {
 
       p.pinned = true;
       document.addEventListener('mousemove', (e) => {
+        if(!this._enableControls) return;
+
         p.x = e.clientX;
         p.y = e.clientY;
       });
@@ -38,10 +42,17 @@ export default class ClothDebug {
 
         p.pinned = false;
 
-        for(let i=0,len=pointColumns;i<len;i++){
-          pts[i].pinned = false;
-        }
+        this.unpin();
       });
+    }
+
+    unpin() {
+      const cl = this.cloth;
+      const pts = cl.points;
+
+      for(let i=0,len=cl.pointColumns;i<len;i++){
+        pts[i].pinned = false;
+      }
     }
 
 }

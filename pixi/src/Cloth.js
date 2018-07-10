@@ -43,11 +43,14 @@ export default class Cloth extends Plane{
 
   updatePoints(t) {
     const pts = this.points;
+    const currentTime = performance.now();
+    const wind = Math.sin(currentTime*0.001)*0.1;
 
     for(let i=0,len=pts.length;i<len;i++){
       const p = pts[i];
       const debug = p.debug;
 
+      p.wind = wind;
       p.updatePhysics(t);
 
       debug.x = p.x;
@@ -100,7 +103,7 @@ export default class Cloth extends Plane{
     for(let i=0,len=verts.length;i<len;i+=2){
       let p = new VerletPoint(verts[i], verts[i+1]);
 
-      if(i/2 < this.pointColumns) p.pinned = true;
+      if((i<30 || i > 80) && i/2 < this.pointColumns) p.pinned = true;
 
       this.points[i/2] = p;
 

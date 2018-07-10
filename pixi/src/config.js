@@ -6,7 +6,8 @@ export const height = 600;
 export const pointsWidth = 55;
 export const pointsHeight = 20;
 
-export const gravity = .2;
+export const gravity = 0.05;
+export const wind = .1;
 export const friction = .9999;
 // export const friction = 1;
 export const bounce = .9;
@@ -16,4 +17,3 @@ export const NUM_STEPS = 8;
 
 // todo take value from url param
 export const ENABLE_DEBUG = true;
-
