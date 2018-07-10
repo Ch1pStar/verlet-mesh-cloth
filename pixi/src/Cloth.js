@@ -1,42 +1,32 @@
 import {stage, dist, getTxt} from './misc.js';
-import Stick from './stick.js';
+import Stick from './Stick.js';
 import VerletPoint from './VerletPoint.js';
-import {pointsWidth, pointsHeight, NUM_STEPS, ENABLE_DEBUG} from './config.js';
+import {pointsWidth, pointsHeight, NUM_STEPS} from './config.js';
 
 const Plane = PIXI.mesh.Plane;
 const Container = PIXI.particles.ParticleContainer;
 const Sprite = PIXI.Sprite;
 const Texture = PIXI.Texture;
 
-export default class Cloth{
+export default class Cloth extends Plane{
 
-  constructor(texture = Texture.WHITE){
+  constructor(texture = Texture.WHITE, pointColumns = pointsWidth, pointRows = pointsHeight){
+    super(texture, pointColumns, pointRows);
+
     this.points = [];
     this.sticks = [];
-    this.plane = null;
-    this.texture = texture;
-
+    this.pointColumns = pointColumns;
+    this.pointRows = pointRows;
+    this._updateSteps = NUM_STEPS;
     this.update = this._update.bind(this);
-
-    this.initPlane();
-  }
-
-  async initPlane() {
-    if(!this.texture.baseTexture.hasLoaded) throw new Error('Cannot create Cloth with textures that are not yet loaded');
-
-    this.plane = new PIXI.mesh.Plane(this.texture, pointsWidth, pointsHeight);
 
     this.createPoints();
 
     this.createSticks();
-
-    this.update(performance.now());
-
-    stage.addChildAt(this.plane, 0);
   }
 
   uploadVerts() {
-    const len = this.plane.vertices.length;
+    const len = this.vertices.length;
     const verts = new Float32Array(len);
 
     for(let i=0;i<len;i+=2){
@@ -48,7 +38,7 @@ export default class Cloth{
       verts[i+1] = y;
     }
 
-    this.plane.vertices = verts;
+    this.vertices = verts;
   }
 
   updatePoints(t) {
@@ -69,15 +59,17 @@ export default class Cloth{
     let q = 0;
     const pts = this.points;
     const sticks = this.sticks;
+    const rows = this.pointRows;
+    const cols = this.pointColumns;
 
-    for(let y=0;y<pointsHeight;y++){
-      for(let x=0;x<pointsWidth;x++){
-        const invert = pointsHeight-y-1; //inverts y axis
+    for(let y=0;y<rows;y++){
+      for(let x=0;x<cols;x++){
+        const invert = rows-y-1; //inverts y axis
 
         //link upward
         if(y != 0) { //skip top row
-          const p0 = pts[invert*pointsWidth+x];
-          const p1 = pts[(invert+1)*pointsWidth+x];
+          const p0 = pts[invert*cols+x];
+          const p1 = pts[(invert+1)*cols+x];
 
           sticks[q] = new Stick({p0:p0, p1: p1, l:dist(p0, p1)});
           q++;
@@ -85,8 +77,8 @@ export default class Cloth{
 
         //link leftward (is that a word?)
         if(x != 0) { //skip left edge
-          const p0 = pts[invert*pointsWidth+x];
-          const p1 = pts[invert*pointsWidth+x-1];
+          const p0 = pts[invert*cols+x];
+          const p1 = pts[invert*cols+x-1];
 
           sticks[q] = new Stick({p0:p0, p1: p1, l:dist(p0, p1)});;
           q++;
@@ -95,9 +87,8 @@ export default class Cloth{
     }
   }
 
-
   createPoints() {
-    const verts = this.plane.vertices;
+    const verts = this.vertices;
     const len = verts.length;
 
     this.points = new Array(len/2);
@@ -109,7 +100,7 @@ export default class Cloth{
     for(let i=0,len=verts.length;i<len;i+=2){
       let p = new VerletPoint(verts[i], verts[i+1]);
 
-      if(i/2 < pointsWidth) p.pinned = true;
+      if(i/2 < this.pointColumns) p.pinned = true;
 
       this.points[i/2] = p;
 
@@ -131,7 +122,7 @@ export default class Cloth{
 
   updateSticks() {
     // console.time('sticks update');
-    for(let k=0;k<NUM_STEPS;k++){
+    for(let k=0;k<this._updateSteps;k++){
       for(let i=0,len=this.sticks.length;i<len;i++){
           this.sticks[i].update();
       }
@@ -140,8 +131,6 @@ export default class Cloth{
   }
 
   _update(t) {
-    requestAnimationFrame(this.update);
-
     this.updatePoints(t);
 
     this.updateSticks(t);

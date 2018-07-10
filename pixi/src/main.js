@@ -1,11 +1,8 @@
-import Cloth from './Cloth.js';
-import {addControls, getTxt} from './misc.js';
+import ClothDebug from './debug/ClothDebug.js';
+import {getTxt} from './misc.js';
 
 async function init() {
-	const txt = await getTxt('rtg-logo.svg')
-	const c = new Cloth(txt);
-
-	addControls(c.points);
+	window.debug = await ClothDebug.create('rtg-logo.svg');
 }
 
 document.addEventListener('DOMContentLoaded', init);
