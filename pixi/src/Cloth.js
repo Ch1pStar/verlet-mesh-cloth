@@ -94,15 +94,18 @@ export default class Cloth extends Plane{
   createPoints() {
     const verts = this.vertices;
     const len = verts.length;
+    const topRowPinLeft = (this.pointColumns * 0.3)|0;
+    const topRowPinRight = (this.pointColumns * 0.7)|0;
 
     this.points = new Array(len/2);
 
     for(let i=0,len=verts.length;i<len;i+=2){
       let p = new VerletPoint(verts[i], verts[i+1]);
+      const pPos = i/2;
 
-      if((i<30 || i > 80) && i/2 < this.pointColumns) p.pinned = true;
+      if((pPos<topRowPinLeft || pPos>topRowPinRight) && pPos < this.pointColumns) p.pinned = true;
 
-      this.points[i/2] = p;
+      this.points[pPos] = p;
     }
   }
 

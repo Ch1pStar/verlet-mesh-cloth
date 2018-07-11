@@ -10,6 +10,8 @@ export default class VerletPoint extends PIXI.Point{
 
         this.gravity = gravity;
         this.wind = wind;
+        this.bounce = bounce;
+        this.friction = friction;
 
         this.pinned = pinned;
 
@@ -18,28 +20,28 @@ export default class VerletPoint extends PIXI.Point{
     constraint(vx, vy) {
         if(this.x > width) {
             this.x = width;
-            this._prevX = this.x + vx * bounce;
+            this._prevX = this.x + vx * this.bounce;
         }
         else if(this.x < 0) {
             this.x = 0;
-            this._prevX = this.x + vx * bounce;
+            this._prevX = this.x + vx * this.bounce;
         }
 
         if(this.y > height) {
             this.y = height;
-            this._prevY = this.y + vy * bounce;
+            this._prevY = this.y + vy * this.bounce;
         }
         else if(this.y < 0) {
             this.y = 0;
-            this._prevY = this.y + vy * bounce;
+            this._prevY = this.y + vy * this.bounce;
         }
     }
 
     updatePhysics(t, log = false) {
         if(this.pinned) return;
         
-        const vx = (this.x - this._prevX) * friction;
-        const vy = (this.y - this._prevY) * friction;
+        const vx = (this.x - this._prevX) * this.friction;
+        const vy = (this.y - this._prevY) * this.friction;
 
         log && console.log(vy, this.y, this._prevY);
         // debugger;

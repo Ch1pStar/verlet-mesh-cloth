@@ -31,12 +31,12 @@ export default class ClothDebug {
 
         stage.addChildAt(cloth, 0);
 
-        this.createDebugPanel();
+        this._createDebugPanel();
 
-        this.createPointsDebug();
+        this._createPointsDebug();
     }
 
-    createPointsDebug() {
+    _createPointsDebug() {
       const pointsDebug = new Container();
       const pts = this.cloth.points;
 
@@ -51,7 +51,7 @@ export default class ClothDebug {
       stage.addChild(pointsDebug);
     }
 
-    createDebugPanel() {
+    _createDebugPanel() {
       const gui = new GUI();
       const f = gui.addFolder('Cloth');
 
