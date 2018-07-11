@@ -3,8 +3,8 @@
 export const width = 1000;
 export const height = 600;
 
-export const pointsWidth = 5;
-export const pointsHeight = 2;
+export const pointsWidth = 20;
+export const pointsHeight = 5;
 
 export const gravity = 0.05;
 export const wind = .1;

@@ -22,21 +22,21 @@ export default class ClothDebug {
     }
 
     constructor(cloth) {
-        this.cloth = cloth;
-        this._isRunning = true;
+      this.cloth = cloth;
+      this._isRunning = true;
 
-        // this.addControls();
+      // this.addControls();
 
-        ticker.add(cloth.update);
-        ticker.add(this._debugUpdate.bind(this));
+      ticker.add(cloth.update);
+      ticker.add(this._debugUpdate.bind(this));
 
-        stage.addChildAt(cloth, 0);
+      stage.addChildAt(cloth, 0);
 
-        this.createPointsDebug();
+      this.createPointsDebug();
 
-        this.pointsFrame.visible = false;
+      this.pointsFrame.visible = false;
 
-        this._createDebugPanel();
+      this._createDebugPanel();
     }
 
     createPointsDebug() {
@@ -68,7 +68,7 @@ export default class ClothDebug {
       f.add(this.cloth, 'hasWind');
       f.add(this.cloth, 'hasGravity');
 
-      document.body.querySelector('.debug-container').appendChild(gui.domElement)
+      document.body.querySelector('.debug-container').appendChild(gui.domElement);
     }
 
     addControls() {
