@@ -52,14 +52,10 @@ export default class Cloth extends Plane{
 
     for(let i=0,len=pts.length;i<len;i++){
       const p = pts[i];
-      const debug = p.debug;
 
       p.wind = wind;
       p.gravity = g;
       p.updatePhysics(t);
-
-      debug.x = p.x;
-      debug.y = p.y;
     }
   }
 
@@ -101,32 +97,13 @@ export default class Cloth extends Plane{
 
     this.points = new Array(len/2);
 
-    const pointsDebug = new Container();
-
-    this.pointsFrame = pointsDebug;
-    stage.addChild(pointsDebug);
-
     for(let i=0,len=verts.length;i<len;i+=2){
       let p = new VerletPoint(verts[i], verts[i+1]);
 
       if((i<30 || i > 80) && i/2 < this.pointColumns) p.pinned = true;
 
       this.points[i/2] = p;
-
-      pointsDebug.addChild(this.createPointDebug(p));
     }
-  }
-
-  createPointDebug(point) {
-    const debugPoint = new PIXI.Sprite(PIXI.Texture.WHITE);
-
-    debugPoint.scale.set(0.2);
-    debugPoint.anchor.set(0.5);
-    debugPoint.position.set(point.x, point.y);
-
-    point.debug = debugPoint;
-
-    return debugPoint;
   }
 
   updateSticks() {

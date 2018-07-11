@@ -1,6 +1,12 @@
 import {stage, getTxt} from '../misc.js';
 import Cloth from '../Cloth.js';
+import PointDebug from './PointDebug.js';
 import { GUI } from '../../../node_modules/dat.gui/build/dat.gui.module.js';
+
+
+// const Container = PIXI.particles.ParticleContainer;
+const Container = PIXI.Container;
+const ticker = PIXI.ticker.shared;
 
 export default class ClothDebug {
 
@@ -20,11 +26,29 @@ export default class ClothDebug {
 
         // this.addControls();
 
-        PIXI.ticker.shared.add(cloth.update);
+        ticker.add(cloth.update);
+        ticker.add(this._debugUpdate.bind(this));
 
         stage.addChildAt(cloth, 0);
 
         this.createDebugPanel();
+
+        this.createPointsDebug();
+    }
+
+    createPointsDebug() {
+      const pointsDebug = new Container();
+      const pts = this.cloth.points;
+
+      for(let i=0;i<pts.length;i++){
+        const pt = pts[i];
+        const sp = new PointDebug(pt, this.cloth);
+
+        pointsDebug.addChild(sp);
+      }
+
+      this.pointsFrame = pointsDebug;
+      stage.addChild(pointsDebug);
     }
 
     createDebugPanel() {
@@ -32,7 +56,8 @@ export default class ClothDebug {
       const f = gui.addFolder('Cloth');
 
       f.open();
-      f.add({frame: true}, 'frame').onChange((val) => this.cloth.pointsFrame.visible = val);
+      f.add({run: true}, 'run').onChange((val) =>  val ? ticker.add(this.cloth.update) : ticker.remove(this.cloth.update));
+      f.add({frame: true}, 'frame').onChange((val) => this.pointsFrame.visible = val);
       f.add({wind: true}, 'wind').onChange((val) => this.cloth.hasWind = val);
       f.add({gravity: true}, 'gravity').onChange((val) => this.cloth.hasGravity = val);
 
@@ -71,4 +96,17 @@ export default class ClothDebug {
       }
     }
 
+
+    _debugUpdate() {
+      const cl = this.cloth;
+      const pts = cl.points;
+
+     
+      for(let i=0,len=pts.length;i<len;i++){
+        const p = pts[i];
+
+        p.debug.position.set(p.x, p.y);
+      }
+
+    }
 }
