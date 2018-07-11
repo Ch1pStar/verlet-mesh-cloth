@@ -32,13 +32,18 @@ export default class ClothDebug {
 
         stage.addChildAt(cloth, 0);
 
-        this._createPointsDebug();
+        this.createPointsDebug();
+
+        this.pointsFrame.visible = false;
+
         this._createDebugPanel();
     }
 
-    _createPointsDebug() {
-      const pointsDebug = new Container();
+    createPointsDebug() {
+      const pointsDebug = this.pointsFrame || new Container();
       const pts = this.cloth.points;
+
+      pointsDebug.removeChildren();
 
       for(let i=0;i<pts.length;i++){
         const pt = pts[i];
@@ -57,11 +62,13 @@ export default class ClothDebug {
 
       f.open();
       f.add(this, 'running');
+      f.add(this, 'frameRows', 3, 100);
+      f.add(this, 'frameCols', 2, 20);
       f.add(this.pointsFrame, 'visible');
       f.add(this.cloth, 'hasWind');
       f.add(this.cloth, 'hasGravity');
 
-      document.body.appendChild(gui.domElement)
+      document.body.querySelector('.debug-container').appendChild(gui.domElement)
     }
 
     addControls() {
@@ -94,6 +101,26 @@ export default class ClothDebug {
       for(let i=0,len=cl.pointColumns;i<len;i++){
         pts[i].pinned = false;
       }
+    }
+
+    set frameRows(val) {
+      val = parseInt(val) | 0;
+      this.cloth.init(val, this.frameCols);
+      this.createPointsDebug();
+    }
+
+    set frameCols(val) {
+      val = parseInt(val) | 0;
+      this.cloth.init(this.frameRows, val);
+      this.createPointsDebug();
+    }
+
+    get frameRows() {
+      return this.cloth.verticesX;
+    }
+
+    get frameCols() {
+      return this.cloth.verticesY;
     }
 
     get running() {

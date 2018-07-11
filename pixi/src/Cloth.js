@@ -13,19 +13,73 @@ export default class Cloth extends Plane{
   constructor(texture = Texture.WHITE, pointColumns = pointsWidth, pointRows = pointsHeight){
     super(texture, pointColumns, pointRows);
 
-    this.points = [];
-    this.sticks = [];
     this.pointColumns = pointColumns;
     this.pointRows = pointRows;
     this._updateSteps = NUM_STEPS;
-    this.update = this._update.bind(this);
-
     this.hasWind = false;
     this.hasGravity = true;
+    this.update = this._update.bind(this);
+
+    this.init();
+  }
+
+  init(cols = this.pointColumns, rows = this.pointRows) {
+    this.verticesX = this.pointColumns = cols;
+    this.verticesY = this.pointRows = rows;
+    this.refresh(true);
 
     this.createPoints();
-
     this.createSticks();
+  }
+
+  createPoints() {
+    const verts = this.vertices;
+    const len = verts.length;
+    const topRowPinLeft = (this.pointColumns * 0.3)|0;
+    const topRowPinRight = (this.pointColumns * 0.7)|0;
+
+    this.points = new Array(len/2);
+
+    for(let i=0,len=verts.length;i<len;i+=2){
+      let p = new VerletPoint(verts[i], verts[i+1]);
+      const pPos = i/2;
+
+      if((pPos<topRowPinLeft || pPos>topRowPinRight) && pPos < this.pointColumns) p.pinned = true;
+
+      this.points[pPos] = p;
+    }
+  }
+
+  createSticks() {
+    let q = 0;
+    const pts = this.points;
+    const sticks = this.sticks = [];
+    const rows = this.pointRows;
+    const cols = this.pointColumns;
+
+    for(let y=0;y<rows;y++){
+      for(let x=0;x<cols;x++){
+        const invert = rows-y-1; //inverts y axis
+
+        //link upward
+        if(y != 0) { //skip top row
+          const p0 = pts[invert*cols+x];
+          const p1 = pts[(invert+1)*cols+x];
+
+          sticks[q] = new Stick({p0:p0, p1: p1, l:dist(p0, p1)});
+          q++;
+        }
+
+        //link leftward (is that a word?)
+        if(x != 0) { //skip left edge
+          const p0 = pts[invert*cols+x];
+          const p1 = pts[invert*cols+x-1];
+
+          sticks[q] = new Stick({p0:p0, p1: p1, l:dist(p0, p1)});;
+          q++;
+        }
+      }
+    }
   }
 
   uploadVerts() {
@@ -56,56 +110,6 @@ export default class Cloth extends Plane{
       p.wind = wind;
       p.gravity = g;
       p.updatePhysics(t);
-    }
-  }
-
-  createSticks() {
-    let q = 0;
-    const pts = this.points;
-    const sticks = this.sticks;
-    const rows = this.pointRows;
-    const cols = this.pointColumns;
-
-    for(let y=0;y<rows;y++){
-      for(let x=0;x<cols;x++){
-        const invert = rows-y-1; //inverts y axis
-
-        //link upward
-        if(y != 0) { //skip top row
-          const p0 = pts[invert*cols+x];
-          const p1 = pts[(invert+1)*cols+x];
-
-          sticks[q] = new Stick({p0:p0, p1: p1, l:dist(p0, p1)});
-          q++;
-        }
-
-        //link leftward (is that a word?)
-        if(x != 0) { //skip left edge
-          const p0 = pts[invert*cols+x];
-          const p1 = pts[invert*cols+x-1];
-
-          sticks[q] = new Stick({p0:p0, p1: p1, l:dist(p0, p1)});;
-          q++;
-        }
-      }
-    }
-  }
-
-  createPoints() {
-    const verts = this.vertices;
-    const len = verts.length;
-    const topRowPinLeft = (this.pointColumns * 0.3)|0;
-    const topRowPinRight = (this.pointColumns * 0.7)|0;
-
-    this.points = new Array(len/2);
-
-    for(let i=0,len=verts.length;i<len;i+=2){
-      let p = new VerletPoint(verts[i], verts[i+1]);
-      const pPos = i/2;
-
-      if((pPos<topRowPinLeft || pPos>topRowPinRight) && pPos < this.pointColumns) p.pinned = true;
-
-      this.points[pPos] = p;
     }
   }
 

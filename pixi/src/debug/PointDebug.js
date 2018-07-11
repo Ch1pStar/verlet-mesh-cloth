@@ -27,12 +27,10 @@ export default class PointDebug extends PIXI.Sprite {
       this.anchor.set(0.5);
       this.updatePosition();
 
-      this._createDebugPanel();
-
       point.debug = this;
     }
 
-    _createDebugPanel() {
+    async _createDebugPanel() {
       const gui = new GUI();
 
       // TODO Better controls
@@ -46,7 +44,7 @@ export default class PointDebug extends PIXI.Sprite {
 
       gui.domElement.style.display = 'none';
       this.debugPanel = gui;
-      document.body.appendChild(gui.domElement)
+      document.body.querySelector('.debug-container').appendChild(gui.domElement)
     }
 
     set active(val) {
@@ -74,6 +72,8 @@ export default class PointDebug extends PIXI.Sprite {
     }
 
     _edit() {
+      if(!this.debugPanel) this._createDebugPanel();
+
       this._editMode = true;
       this.off('mouseover', this._activate);
       this.off('mouseout', this._deactivate);
