@@ -23,6 +23,7 @@ export default class ClothDebug {
 
     constructor(cloth) {
         this.cloth = cloth;
+        this._isRunning = true;
 
         // this.addControls();
 
@@ -31,9 +32,8 @@ export default class ClothDebug {
 
         stage.addChildAt(cloth, 0);
 
-        this._createDebugPanel();
-
         this._createPointsDebug();
+        this._createDebugPanel();
     }
 
     _createPointsDebug() {
@@ -56,10 +56,10 @@ export default class ClothDebug {
       const f = gui.addFolder('Cloth');
 
       f.open();
-      f.add({run: true}, 'run').onChange((val) =>  val ? ticker.add(this.cloth.update) : ticker.remove(this.cloth.update));
-      f.add({frame: true}, 'frame').onChange((val) => this.pointsFrame.visible = val);
-      f.add({wind: true}, 'wind').onChange((val) => this.cloth.hasWind = val);
-      f.add({gravity: true}, 'gravity').onChange((val) => this.cloth.hasGravity = val);
+      f.add(this, 'running');
+      f.add(this.pointsFrame, 'visible');
+      f.add(this.cloth, 'hasWind');
+      f.add(this.cloth, 'hasGravity');
 
       document.body.appendChild(gui.domElement)
     }
@@ -94,6 +94,15 @@ export default class ClothDebug {
       for(let i=0,len=cl.pointColumns;i<len;i++){
         pts[i].pinned = false;
       }
+    }
+
+    get running() {
+      return this._isRunning;
+    }
+
+    set running(val) {
+      this._isRunning = val;
+      this._isRunning ? ticker.add(this.cloth.update) : ticker.remove(this.cloth.update)
     }
 
     _debugUpdate() {

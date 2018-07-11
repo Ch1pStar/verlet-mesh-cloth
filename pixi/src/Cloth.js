@@ -20,7 +20,7 @@ export default class Cloth extends Plane{
     this._updateSteps = NUM_STEPS;
     this.update = this._update.bind(this);
 
-    this.hasWind = true;
+    this.hasWind = false;
     this.hasGravity = true;
 
     this.createPoints();
