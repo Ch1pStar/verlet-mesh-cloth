@@ -96,17 +96,9 @@ export default class ClothDebug {
       }
     }
 
-
     _debugUpdate() {
-      const cl = this.cloth;
-      const pts = cl.points;
+      const pts = this.cloth.points;
 
-     
-      for(let i=0,len=pts.length;i<len;i++){
-        const p = pts[i];
-
-        p.debug.position.set(p.x, p.y);
-      }
-
+      for(let i=0,len=pts.length;i<len;i++) pts[i].debug.update();
     }
 }

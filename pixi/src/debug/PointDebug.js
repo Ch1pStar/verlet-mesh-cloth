@@ -16,20 +16,51 @@ export default class PointDebug extends PIXI.Sprite {
       this.cloth = cloth;
       this.point = point;
 
-      this._deactivate();
-      this.anchor.set(0.5);
-      this.position.set(point.x, point.y);
-
       this.interactive = true;
-      this.on('mouseover', this._activate);
+      this._deactivate();
+      this._exitEdit();
+      this.on('click', this.toggleEdit);
 
-      this.on('mouseout', this._deactivate);
+      this.anchor.set(0.5);
+      this.updatePosition();
 
       point.debug = this;
     }
 
     set active(val) {
       val ? this._activate() : this._deactivate();
+    }
+
+    toggleEdit() {
+      this.editMode = !this.editMode;
+    }
+
+    set editMode(val) {
+      val ? this._edit() : this._exitEdit();
+    }
+
+    get editMode() {
+      return this._editMode;
+    }
+
+    update() {
+      this.updatePosition();
+    }
+
+    updatePosition() {
+      this.position.set(this.point.x, this.point.y);
+    }
+
+    _edit() {
+      this._editMode = true;
+      this.off('mouseover', this._activate);
+      this.off('mouseout', this._deactivate);
+    }
+
+    _exitEdit() {
+      this._editMode = false;
+      this.on('mouseover', this._activate);
+      this.on('mouseout', this._deactivate);
     }
 
     _activate() {
